@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 import { Book, BookDocument } from '../../src/books/schemas/book.schema';
 import { BooksModule } from '../../src/books/books.module';
 
-describe('Books controller', () => {
+describe.skip('Books controller', () => {
   let bookModel;
   let app;
   let mongo;
@@ -36,39 +36,51 @@ describe('Books controller', () => {
 
   beforeEach(() => {
     const mockBook = {
-      title: 'test',
+      title: 'test-prueba',
       author: 'test',
     };
     return bookModel.create(mockBook);
   });
 
-  afterEach(() => {
-    bookModel.remove({});
+  it('POST /books', async () => {
+    return await request(app.getHttpServer())
+      .post('/books')
+      .send({ title: 'E2E Testing', author: 'JV' })
+      .expect(201);
   });
 
-  it('POST /books', () => {
-    return request(app.getHttpServer())
-      .post('/books')
-      .expect(201)
-      .send({ title: 'prueba', author: 'prueba' });
+  it('GET /books', async () => {
+    const result = await request(app.getHttpServer()).get('/books');
+    expect(result.body[0].title).toBe('test-prueba');
   });
 
   it('GET /books', async () => {
     const result = await request(app.getHttpServer()).get('/books').expect(200);
-    expect(result.body[0].title).toStrictEqual('prueba');
+    expect(result.body.length > 0).toBeTruthy();
   });
 
-  it('GET /books/:id', async () => {
+  it.skip('GET /books/:id', async () => {
     const result = await request(app.getHttpServer()).get(
-      '/books/612e9d8e4e6bb55fbbd47094',
+      '/books/612fb9db3c7b4e2731f9eead',
     );
     expect(result.statusCode).toEqual(200);
   });
 
-  it('GET /books/:id', async () => {
-    const result = await request(app.getHttpServer()).get('/books/123');
+  it.skip('GET /books/:id', async () => {
+    const result = await request(app.getHttpServer()).get(
+      '/books/qwertyui0123456789',
+    );
     expect(result.statusCode).toEqual(500);
   });
+
+  it.skip('DELETE /books', async () => {
+    const result = await request(app.getHttpServer()).delete('/books');
+    expect(result.statusCode).toEqual(200);
+  });
+
+  // afterEach(() => {
+  //   bookModel.remove({});
+  // });
 
   afterAll(() => {
     mongo.stop();

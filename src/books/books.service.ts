@@ -22,4 +22,12 @@ export class BooksService {
   async findAll(): Promise<Book[]> {
     return await this.bookModel.find().exec();
   }
+
+  async deleteOne(id: string): Promise<Book> {
+    return await this.bookModel.findByIdAndRemove(id).exec();
+  }
+
+  async deleteAll(): Promise<Book> {
+    return await this.bookModel.remove().exec();
+  }
 }
